@@ -1,0 +1,5 @@
+README.txt
+*.out
+*.err
+GBS-PreProcess/README.md
+GBS-PreProcess/verify_chimeras.pl
