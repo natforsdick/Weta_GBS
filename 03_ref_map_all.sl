@@ -1,7 +1,7 @@
 #!/bin/bash -e
-#SBATCH -J ref_map
+#SBATCH -J ref_map_bwa
 #SBATCH -A ga03186
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 #SBATCH --mem=3G
 #SBATCH --cpus-per-task=6
 #SBATCH --out=%x.%j.out
@@ -27,23 +27,37 @@ module list
 
 ############
 # PARAMS
-INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batchcombo_adap/03_stacks_sorted/ 
-OUTDIR=/nesi/nobackup/ga03186/Weta_GBS_Batchcombo_adap/04_ref_map/
+INDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/02_bwa_sorted/ 
+OUTDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/03_ref_map/
 REF=/nesi/nobackup/ga03186/reference/
 list=/nesi/project/ga03186/ref/
 #refstack=Weta_GBS_Batch2_POP.txt
 #poplist="Het Mah Fallai 
-poplist="weta_all_popmap"
+poplist1="weta_all_popmap Het Mahoenui_all Fallai"
+
+INDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/02_bowtie_sorted/
+OUTDIR2=//nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/03_ref_map/
 ############
-for pop in $poplist
+for pop in $poplist1
 do
-if [ ! -e ${OUTDIR}Weta_GBS_adap_${pop} ]; then
-mkdir -p ${OUTDIR}Weta_GBS_adap_${pop}
+if [ ! -e ${OUTDIR1}${pop} ]; then
+mkdir -p ${OUTDIR1}${pop}
+mkdir -p ${OUTDIR2}${pop}
 fi
 
-cd ${OUTDIR}Weta_GBS_adap_${pop}
+cd ${OUTDIR1}${pop}
 
-echo "Running ref_map for ${pop}"
-srun ref_map.pl -T 10 --samples $INDIR --popmap ${list}${pop}.txt -o ${OUTDIR}Weta_GBS_adap_${pop}
-echo "Finished ref_map for ${pop}"
+echo "Running ref_map for ${pop}, ${OUTDIR1}"
+srun ref_map.pl -T 10 --samples $INDIR1 --popmap ${list}${pop}.txt -o ${OUTDIR1}${pop}
+echo "Finished ref_map for ${pop}, ${OUTDIR1}"
+
+cd ${OUTDIR2}${pop}
+ 
+echo "Running ref_map for ${pop}, ${OUTDIR2}"
+srun ref_map.pl -T 10 --samples $INDIR2 --popmap ${list}${pop}.txt -o ${OUTDIR2}${pop}
+echo "Finished ref_map for ${pop}, ${OUTDIR2}"
+
 done
+
+
+
