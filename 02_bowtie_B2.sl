@@ -1,10 +1,10 @@
 #!/bin/bash -e
 #SBATCH --job-name=bowtie_B2
 #SBATCH -A ga03186
-#SBATCH --time=00:15:00 # 04:00:00
-#SBATCH --mem=10G # 22G
-#SBATCH --cpus-per-task=10 # 6
-#SBATCH --array=1-1 #96%6 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
+#SBATCH --time=00:18:00 # 04:00:00
+#SBATCH --mem=12G # 22G
+#SBATCH --cpus-per-task=12 # 6
+#SBATCH --array=1-96%6 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
 #SBATCH --out=%x.%j.out
 #SBATCH --err=%x.%j.err
 #SBATCH --mail-type=FAIL,END
