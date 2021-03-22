@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #SBATCH -J ref_map_bwa
 #SBATCH -A ga03186
-#SBATCH --time=02:00:00
+#SBATCH --time=03:00:00
 #SBATCH --mem=3G
 #SBATCH --cpus-per-task=6
 #SBATCH --out=%x.%j.out
@@ -27,13 +27,13 @@ module list
 
 ############
 # PARAMS
-INDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/02_bwa_sorted/ 
+INDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/02_bwa_sorted/
 OUTDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/03_ref_map/
 REF=/nesi/nobackup/ga03186/reference/
 list=/nesi/project/ga03186/ref/
 #refstack=Weta_GBS_Batch2_POP.txt
 #poplist="Het Mah Fallai 
-poplist1="weta_all_popmap Het Mahoenui_all Fallai"
+poplist1="Het Mah Mahoenui_all Fallai Batch2_pop weta_all_popmap"
 
 INDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/02_bowtie_sorted/
 OUTDIR2=//nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/03_ref_map/
