@@ -1,8 +1,8 @@
 #!/bin/bash -e
 #SBATCH -J stacks_pop
 #SBATCH -A ga03186
-#SBATCH --time=00:20:00
-#SBATCH --mem=200M
+#SBATCH --time=01:00:00
+#SBATCH --mem=400M
 #SBATCH --cpus-per-task=4
 #SBATCH --out=%x.%j.out
 #SBATCH --err=%x.%j.err
@@ -23,9 +23,11 @@ module load Stacks/2.41-gimkl-2018b
 
 ############
 # PARAMS
-INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batchcombo_adap/04_ref_map/
-OUTDIR=/nesi/nobackup/ga03186/Weta_GBS_Batchcombo_adap/05_populations_all/
-poplist="weta_all_popmap"
+INDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/03_ref_map/
+INDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/03_ref_map/
+OUTDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/04_populations/
+OUTDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/04_populations/
+poplist="Het Mah Fallai Batch2_pop weta_all_popmap Mahoenui_all"
 #POPMAP=/nesi/project/ga03186/ref/Weta_GBS_Batch2_POP_blankrem.txt
 REFDIR=/nesi/project/ga03186/ref/
 ############
@@ -33,15 +35,30 @@ which populations
 
 for pop in $poplist;
 do
-if [ ! -e ${OUTDIR}${pop}_a/ ]; then
-mkdir -p ${OUTDIR}${pop}_a/
-mkdir -p ${OUTDIR}${pop}_b/
+
+if [ ! -e ${OUTDIR1}${pop}_a/ ]; then
+mkdir -p ${OUTDIR1}${pop}_a/
+mkdir -p ${OUTDIR1}${pop}_b/
 fi
 
+if [ ! -e ${OUTDIR2}${pop}_a/  ]; then
+mkdir -p ${OUTDIR2}${pop}_a/
+mkdir -p ${OUTDIR2}${pop}_b/
+fi
+
+
 echo "Running stacks populations for ${pop}, no missing data"
-populations -P ${INDIR}Weta_GBS_adap_${pop} -O ${OUTDIR}${pop}_a/ -M ${REFDIR}${pop}.txt -t 8 --min-maf 0.05 --hwe --fstats --smooth-popstats --smooth --bootstrap --vcf --structure --genepop -r 1 --write-single-snp
+populations -P ${INDIR1}${pop} -O ${OUTDIR1}${pop}_a/ -M ${REFDIR}${pop}.txt -t 8 --min-maf 0.05 --hwe --fstats --smooth-popstats --smooth --bootstrap --vcf --structure --genepop -r 1 --write-single-snp
 
 echo "Running stacks populations for ${pop}, 30% missing data"
-populations -P ${INDIR}Weta_GBS_adap_${pop} -O ${OUTDIR}${pop}_b/ -M ${REFDIR}${pop}.txt -t 8 --min-maf 0.05 --hwe --fstats --smooth-popstats --smooth --bootstrap --vcf --structure --genepop -r 0.7 --write-single-snp
-echo "Completed stacks processing for ${pop}"
+populations -P ${INDIR1}${pop} -O ${OUTDIR1}${pop}_b/ -M ${REFDIR}${pop}.txt -t 8 --min-maf 0.05 --hwe --fstats --smooth-popstats --smooth --bootstrap --vcf --structure --genepop -r 0.7 --write-single-snp
+echo "Completed stacks processing for ${pop} bwa"
+
+echo "Running stacks populations for ${pop} bowtie, no missing data"
+populations -P ${INDIR2}${pop} -O ${OUTDIR2}${pop}_a/ -M ${REFDIR}${pop}.txt -t 8 --min-maf 0.05 --hwe --fstats --smooth-popstats --smooth --bootstrap --vcf --structure --genepop -r 1 --write-single-snp
+   
+echo "Running stacks populations for ${pop}, 30% missing data"
+populations -P ${INDIR2}${pop} -O ${OUTDIR2}${pop}_b/ -M ${REFDIR}${pop}.txt -t 8 --min-maf 0.05 --hwe --fstats --smooth-popstats --smooth --bootstrap --vcf --structure --genepop -r 0.7 --write-single-snp
+echo "Completed stacks processing for ${pop} bowtie"
+
 done
