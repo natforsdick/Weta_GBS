@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #SBATCH -J ref_map_bwa
 #SBATCH -A ga03186
-#SBATCH --time=03:00:00
+#SBATCH --time=01:30:00
 #SBATCH --mem=6G
 #SBATCH --cpus-per-task=6
 #SBATCH --out=%x.%j.out
@@ -38,34 +38,34 @@ poplist2="Mahoenui_all"
 INDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/02_bowtie_sorted/
 OUTDIR2=//nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/03_ref_map/
 ############
-for pop in $poplist1
-do
-if [ ! -e ${OUTDIR1}${pop} ]; then
-mkdir -p ${OUTDIR1}${pop}
-mkdir -p ${OUTDIR2}${pop}
-fi
+#for pop in $poplist1
+#do
+#if [ ! -e ${OUTDIR1}${pop} ]; then
+#mkdir -p ${OUTDIR1}${pop}
+#mkdir -p ${OUTDIR2}${pop}
+#fi
 
-cd ${OUTDIR1}${pop}
+#cd ${OUTDIR1}${pop}
 
-echo "Running ref_map for ${pop}, ${OUTDIR1}"
-srun ref_map.pl -T 10 --samples $INDIR1 --popmap ${list}${pop}.txt -o ${OUTDIR1}${pop}
-echo "Finished ref_map for ${pop}, ${OUTDIR1}"
+#echo "Running ref_map for ${pop}, ${OUTDIR1}"
+#srun ref_map.pl -T 10 --samples $INDIR1 --popmap ${list}${pop}.txt -o ${OUTDIR1}${pop}
+#echo "Finished ref_map for ${pop}, ${OUTDIR1}"
 
-cd ${OUTDIR2}${pop}
+#cd ${OUTDIR2}${pop}
  
+#echo "Running ref_map for ${pop}, ${OUTDIR2}"
+#srun ref_map.pl -T 10 --samples $INDIR2 --popmap ${list}${pop}.txt -o ${OUTDIR2}${pop}
+#echo "Finished ref_map for ${pop}, ${OUTDIR2}"
+
+#done
+
+for pop in $poplist2
+do
+cd ${OUTDIR2}
 echo "Running ref_map for ${pop}, ${OUTDIR2}"
 srun ref_map.pl -T 10 --samples $INDIR2 --popmap ${list}${pop}.txt -o ${OUTDIR2}${pop}
 echo "Finished ref_map for ${pop}, ${OUTDIR2}"
-
-done
-
-for pop in $poplist2
-    do
-        cd ${OUTDIR2}
-        echo "Running ref_map for ${pop}, ${OUTDIR2}"
-         srun ref_map.pl -T 10 --samples $INDIR2 --popmap ${list}${pop}.txt -o ${OUTDIR2}${pop}
-          echo "Finished ref_map for ${pop}, ${OUTDIR2}"
            
-            done
+done
 
 
