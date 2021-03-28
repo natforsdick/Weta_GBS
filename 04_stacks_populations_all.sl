@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #SBATCH -J stacks_pop
 #SBATCH -A ga03186
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 #SBATCH --mem=300M
 #SBATCH --cpus-per-task=4
 #SBATCH --out=%x.%j.out
