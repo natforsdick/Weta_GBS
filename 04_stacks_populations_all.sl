@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #SBATCH -J stacks_pop
 #SBATCH -A ga03186
-#SBATCH --time=02:00:00
+#SBATCH --time=02:40:00
 #SBATCH --mem=300M
 #SBATCH --cpus-per-task=4
 #SBATCH --out=%x.%j.out
@@ -29,7 +29,8 @@ OUTDIR1=/nesi/nobackup/ga03186/Weta_GBS_bwa_B1_B2/04_populations/
 OUTDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/04_populations/
 #poplist="Mah Fallai Batch2_pop weta_all_popmap Mahoenui_all"
 #poplist="Mahoenui_all"
-poplist="weta_all_popmap"
+#poplist="weta_all_popmap"
+poplist="weta_all_popmap_batch"
 #POPMAP=/nesi/project/ga03186/ref/Weta_GBS_Batch2_POP_blankrem.txt
 REFDIR=/nesi/project/ga03186/ref/
 ############

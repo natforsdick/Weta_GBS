@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #SBATCH -J ref_map_bwa
 #SBATCH -A ga03186
-#SBATCH --time=01:20:00
+#SBATCH --time=01:30:00
 #SBATCH --mem=6G
 #SBATCH --cpus-per-task=6
 #SBATCH --out=%x.%j.out
@@ -35,7 +35,8 @@ list=/nesi/project/ga03186/ref/
 #poplist="Het Mah Fallai 
 #poplist1="Fallai Batch2_pop weta_all_popmap"
 #poplist2="Mahoenui_all"
-poplist3="weta_all_popmap_batch"
+#poplist3="weta_all_popmap_batch"
+poplist4="Mahoenui_all_pop"
 INDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/02_bowtie_sorted/
 OUTDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/03_ref_map/
 ############
@@ -48,9 +49,9 @@ fi
 
 cd ${OUTDIR1}${pop}
 
-#echo "Running ref_map for ${pop}, ${OUTDIR1}"
-#srun ref_map.pl -T 10 --samples $INDIR1 --popmap ${list}${pop}.txt -o ${OUTDIR1}${pop}
-#echo "Finished ref_map for ${pop}, ${OUTDIR1}"
+echo "Running ref_map for ${pop}, ${OUTDIR1}"
+srun ref_map.pl -T 10 --samples $INDIR1 --popmap ${list}${pop}.txt -o ${OUTDIR1}${pop}
+echo "Finished ref_map for ${pop}, ${OUTDIR1}"
 
 cd ${OUTDIR2}${pop}
  
