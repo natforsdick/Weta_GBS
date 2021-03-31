@@ -40,7 +40,7 @@ poplist4="Mahoenui_all_pop"
 INDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/02_bowtie_sorted/
 OUTDIR2=/nesi/nobackup/ga03186/Weta_GBS_bowtie_B1_B2/03_ref_map/
 ############
-for pop in $poplist3
+for pop in $poplist4
 do
 if [ ! -e ${OUTDIR1}${pop} ]; then
 mkdir -p ${OUTDIR1}${pop}
