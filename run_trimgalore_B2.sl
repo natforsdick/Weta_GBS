@@ -20,14 +20,14 @@
 # PARAMS  #
 ###########
 cutadapt=/opt/nesi/mahuika/cutadapt/2.3-gimkl-2018b-Python-3.7.3/bin/cutadapt
-adapter1="AAGATCGGAAGAGC" # SE adapter: "CTGCAAGATCGGAAGAGC"
+adapter1="AGATCGGAAGAGC" # SE adapter: "CTGCAAGATCGGAAGAGC"
 adapter2="AGATCGGAAGAGC" # Standard Illumina, as determined by automatic detection.
 #adapter="CTGCAAGATCGGAAGAGC"
-INDIR1=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01a_stacks_demux_raw/
+INDIR1=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01a_stacks_demux_PE_raw/
 samplist=/nesi/project/ga03186/ref/Weta_GBS_Batch2_filelist.txt
 
-OUTDIR1=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01b_B2_trimmed/
-QC1=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01b_B2_trimmed/B2_trimmed_QC/
+OUTDIR1=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01b_PE_B2_trimmed/
+QC1=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01b_PE_B2_trimmed/PE_B2_trimmed_QC/
 ###########
 
 ###########
