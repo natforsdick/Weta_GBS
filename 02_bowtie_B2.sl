@@ -1,10 +1,10 @@
 #!/bin/bash -e
 #SBATCH --job-name=bowtie_B2
 #SBATCH -A ga03186
-#SBATCH --time=00:18:00 # 04:00:00
+#SBATCH --time=01:00:00 # 04:00:00
 #SBATCH --mem=12G # 22G
 #SBATCH --cpus-per-task=12 # 6
-#SBATCH --array=1-96%6 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
+#SBATCH --array=1-96%8 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
 #SBATCH --out=%x.%j.out
 #SBATCH --err=%x.%j.err
 #SBATCH --mail-type=FAIL,END
@@ -37,10 +37,10 @@ samplist=/nesi/project/ga03186/ref/Weta_GBS_Batch2_filelist.txt
 #OUTSAM=/nesi/nobackup/ga03186/Weta_GBS_Batch1/02_bowtie_B1/SAM/
 #OUTBAM=/nesi/nobackup/ga03186/Weta_GBS_Batch1/02_bowtie_B1/BAM/
 #OUTSORT=/nesi/nobackup/ga03186/Weta_GBS_Batch1/02_bowtie_B1/02_bowtie_B1_sorted/
-INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01b_B2_trimmed/
-OUTSAM=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_B2/SAM/
-OUTBAM=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_B2/BAM/
-OUTSORT=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_B2/02_bowtie_B2_sorted/
+INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PEb/01b_PE_B2_trimmed/
+OUTSAM=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_PE_B2/SAM/
+OUTBAM=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_PE_B2/BAM/
+OUTSORT=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_PE_B2/02_bowtie_PE_B2_sorted/
 ###########
 
 if [ ! -e ${OUTSORT} ]; then
@@ -63,12 +63,12 @@ echo 'Aligning '${QUERY}
 #### When using Stacks demux inputs:
 # Trimmed output format: MI31.1_val_1.fq.gz
 # For paired-end reads:
-#bowtie2 --very-sensitive-local --no-unal --threads 6 \
-#-x $refdir$reffile \
-#-1 $QUERY.1.fq.gz -2 $QUERY.2.fq.gz -S $OUTSAM$QUERY.sam
+bowtie2 --very-sensitive-local --no-unal --threads 8 \
+-x $refdir$reffile \
+-1 $QUERY.1_val_1.fq.gz -2 $QUERY.2_val_2.fq.gz -S $OUTSAM$QUERY.sam
 
 # For single-end reads:
-bowtie2 --very-sensitive-local --no-unal --threads 8 -x $refdir$reffile -U ${INDIR}${QUERY}.1_val_1.fq.gz -S ${OUTSAM}${QUERY}.sam
+#bowtie2 --very-sensitive-local --no-unal --threads 8 -x $refdir$reffile -U ${INDIR}${QUERY}.1_val_1.fq.gz -S ${OUTSAM}${QUERY}.sam
 
 echo 'Sorting '${QUERY}
 samtools view -bSh $OUTSAM$QUERY.sam | samtools sort - -o $OUTSORT$QUERY.sorted.bam
@@ -81,7 +81,7 @@ unmap=$(samtools view -f4 -c ${OUTSORT}${QUERY}.sorted.bam)
 total=$(($map + $unmap))
 perc_mapped=`echo "scale=4;($map/$total)*100" | bc`
          
-echo "$QUERY1.bam" >> ${OUTSORT}B1_bwa_mapping_stats.txt
+echo "$QUERY.bam" >> ${OUTSORT}B1_bwa_mapping_stats.txt
 echo "mapped $map" >> ${OUTSORT}B1_bwa_mapping_stats.txt
 echo "perc_mapped $perc_mapped" >> ${OUTSORT}B1_bwa_mapping_stats.txt
 echo "unmapped $unmap" >> ${OUTSORT}B1_bwa_mapping_stats.txt
