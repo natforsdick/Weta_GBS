@@ -23,7 +23,7 @@
 module purge
 module load Stacks/2.41-gimkl-2018b
 ###########
-mkdir /nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE
+mkdir /nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01a_stacks_demux_PE_raw/
 
 # process_radtags -1 pair_1 -2 pair_2 [-b barcode_file] -o out_dir -e enz [-c] [-q] [-r] [-t len]
 #  -P = paired-end data, -p = in_dir, -i = input filetype, -b = barcode file, -c = clean data, \
