@@ -1,0 +1,200 @@
+---
+title: "Weta_Adegenet_Manoenui_pop"
+author: "Nat Forsdick"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE,cache=TRUE}
+
+knitr::opts_knit$set(root.dir = "~/Documents/weta_GBS/GBS_stats/2021-03-29_Results/",echo = TRUE,ppi=600,units="in")
+```
+
+
+Using the adegenet package in R  to explore the weta GBS datasets. Using the workflows in 'Analysing genome-wide SNP data using adegenet 2.0.0', and 'A tutorial for Discriminant Analysis of PrincipalComponents (DAPC) using adegenet 2.0.0' Jombart & Collins 2015. 
+
+
+```{r packages, message=FALSE, echo=FALSE}
+# Loading all the packages I need.
+library(ade4)
+library(adegenet)
+library(ape)
+library(RColorBrewer)
+library(parallel)
+library("Manu")
+#library(hierfstat)
+#library(pegas)
+sessionInfo()
+
+citation("adegenet")
+```
+
+
+```{r colours, fig.height=20, fig.width=10, echo=FALSE}
+names(manu_palettes)
+Titipounamu <- get_pal("Titipounamu")
+
+```
+
+Input files were prepared from Stacks _populations_ tool, with output PLINK format files passed to PLINK v1.90b6.21 64-bit (19 Oct 2020), and converted to RAW format files using `--aec --recode A` commands. Headers are removed from MAP files, and RAW and MAP files are then passed into the R package Adegenet.
+
+As an initial test, we are looking at a file containing all weta samples, with species-level information, mapped against the reference genome using BWA, and stringent SNP filtering of no missing data (`-r` = 1,  minimum 100% percent of individuals in a population required to process a locus for that population), and a minor allele frequency cut-off of 0.05. 
+
+```{r input}
+GBS <- read.PLINK(file="./BWA/Mahoenui_all_pop_BWA_a.raw",
+                  map.file = "./BWA/Mahoenui_all_pop_a.p.plink.map")
+
+```
+
+Let's check how many individuals and how many SNPs we are working with. 
+
+```{r checks, fig.height=7, fig.width=12}
+# checking that population and individual names are fine
+GBS
+#GBS@pop
+poplevels<-GBS@pop
+#indNames(GBS)
+```
+
+From this we can see that, although we have specified no missing data _within_ populations, there is a lot of missing data _between_ populations. We could consider additional filtering in Stacks _populations_ to include `-p`, the minimum number of populations a locus must be present in to process a locus.
+
+Now let's consider the pattern of missing data, along with the allele frequency distributions.
+
+```{r allele_freq, fig.height=7.2, fig.width=12}
+par(cex=1.5) 
+glPlot(GBS)
+myFreq <- glMean(GBS)
+myFreq <- c(myFreq, 1-myFreq)
+hist(myFreq, proba=TRUE, col="#5B88C1", xlab="Allele frequencies",
+     main="Distribution of allele frequencies", nclass=20,ylim = c(0,8))
+temp <- density(myFreq, bw=.05)
+lines(temp$x, temp$y*2,lwd=3)
+```
+
+We are seeing some very strange patterns here, likely resulting from the inclusion of individuals of different species having many private alleles.
+
+For now, let's continue to check that our DAPC pipeline works for this data, and let's go back and reconsider our filtering strategy later. 
+First, we plot a neighbour-joining tree, from distances calculated from allele frequencies. 
+
+```{r tree, fig.height=10, fig.width=10}
+tre <- nj(dist(as.matrix(GBS)))
+
+
+plot(tre, typ="r", show.tip.label=FALSE)
+tiplabels(pch=20, cex=2, col=Titipounamu[as.numeric(pop(GBS))])
+#legend("topright", legend=c("D. fallai", "D. heteracantha", "D. mahoenui"), 
+#       col=Titipounamu, pch=20, cex = 1.4)
+title("Neighbour-joining tree of weta data")
+```
+
+We can then expand out this tree to see the phylogenetic relationships more clearly.
+
+```{r treeb, fig.height=10, fig.width=10}
+plot(tre, typ="fan", show.tip.label=FALSE)
+tiplabels(pch=20, cex=2, col=Titipounamu[as.numeric(pop(GBS))])
+#legend("topright", legend=c("D. fallai", "D. heteracantha", "D. mahoenui"), 
+#       col=Titipounamu, pch=20, cex = 1.4)
+title("Neighbour-joining tree of weta data")
+```
+
+Now, I want to try and see if we can identify some clusters within this data without using the a priori population information. To make it less 
+computationally expensive, I am first performing the PCA calculations. I am keeping 50 PCA components at this stage (which includes all 
+of them), so I can see how many of them actually contribute to the variation. Then, I am retaining a high number of clusters (`max.n.clust=40`) 
+to test at first. A BIC test is used to evaluate the likelihood of each number of clusters.
+
+Let's first check against the DAPC tutorial - this produces a graph of cumulative variance explained by eigenvalues of the PCA - we need to specify 100 PCs to retain, and 40 clusters.
+
+```{r tutorial_1, fig.height=7.2, fig.width=12}
+par(cex=1.5) 
+
+# Using this line presents the option to choose the number of PCs and number of 
+# clusters on the console, but this will not work when running markdown. 
+# grp1 <- find.clusters(GBS, max.n.clust = 40)
+grp1 <- find.clusters(GBS, max.n.clust = 40, n.pca = 100, n.clust = 40)
+```
+
+```{r tutorial_1alt, fig.height=7.2, fig.width=12}
+GBS_pca <- glPca(GBS, useC = FALSE, parallel = TRUE, nf=100)
+barplot(GBS_pca$eig, main="eigenvalues", col=heat.colors(length(GBS_pca$eig)),
+        xlab="Linear Discriminants", ylab="F-statistic",ylim=c(0,100)) 
+#this is output automatically if nf=NULL, but Rmarkdown won't let me
+grp <- find.clusters(GBS, max.n.clust=100, glPca = GBS_pca, n.pca=100, 
+                     choose = FALSE, stat = "BIC")
+plot(grp$Kstat, type = "o", xlab = "number of clusters (K)",
+     #again, as above, I normally set choose=TRUE and the plot is output automatically
+     ylab = "BIC", col = "blue",
+     main = "Value of BIC versus number of clusters")
+grp <- find.clusters(GBS, max.n.clust=100, glPca = GBS_pca, n.pca=40, n.clust = 3)
+```
+
+Now let's see how well this resolves against our population information. Here, 'ori' corresponds to our predetermined groups, compared with our infered groups. 
+
+```{r tutorial_2, fig.height=7.2, fig.width=12}
+table(pop(GBS),grp$grp)
+
+table.value(table(pop(GBS), grp$grp), col.lab=paste("inf", 1:3),row.lab=paste("ori", 1:3))
+```
+
+Here we can see that this is splitting our single Mahoenui group into two distinct groups. 
+
+Initially I gave DAPC 100 PCs and 100 clusters. Based on the outputs of this preliminary exploration, it is appropriate to retain the first XX PCs to capture ~% of the variance, along with just the  DAs.
+
+```{r tutorial_3, fig.height=7.2, fig.width=12}
+
+dapc1 <- dapc(GBS, grp$grp, n.pca=60, n.da=3)
+dapc1
+```
+
+
+```{r tutorial_4, fig.height=6, fig.width=8}
+scatter(dapc1, posi.da="topright", col=Titipounamu, scree.pca=TRUE, posi.pca="topleft", clab=0, cex = 3, solid = 0.6, leg= TRUE,
+        txt.leg=paste("Cluster", 1:4), 
+        posi.leg = "bottomright")
+```
+
+Now we can consider membership probabilities to the groups, and the proportions of successful reassignments to the predetermined populations. Red represents membership probability of 1.000, white of 0.000, blue crosses represent the prior cluster information passed to DAPC. 
+
+```{r tutorial_5, fig.height=6, fig.width=8}
+summary(dapc1)
+assignplot(dapc1)
+``` 
+
+This shows that our data is consistently assigned to the predefined clusters. 
+
+Let's carry out cross-validation of our data, to find the right spot between too many and too few PCs. It splits the data into a training set and a validation set (90% and 10% of the data, respectively), and tests the accuracy with which the retained PCs in the training set can predict the assignment of the validation set, and the process is repeated through n replicates (here we do it 50 times). The suggestion is then to keep the number of PCs that gives the lowest Mean Square Error (ideally this would also be the number of PCs that has the Highest Mean Success). Looks like the _"goldilocks point"_ here is between XX and XX PCs. Based on our aim of not over-fitting the data, retaining XX PCs as in dapc3 is probably sufficient. 
+
+```{r PC_optimization, eval=FALSE, fig.height=7.2, fig.width=12, include=FALSE}
+par(cex=1.5) 
+
+mat <- tab(GBS, NA.method="mean")
+set.seed(999)
+system.time(xval <- xvalDapc(mat, pop(GBS), n.pca.max = 100, training.set = 0.9,
+                 result = "groupMean", center = TRUE, scale = FALSE,
+                 n.pca = NULL, n.rep = 50, xval.plot = TRUE, parallel = "multicore", ncpus = 4))
+xval[2:6]
+#xval[-1]
+```
+
+Now let's also consider the a-score, which measures the trade-off between the power of discrimination and over-fitting, by comparing the proportion of successful reassignments correcting for the number of PCs. It uses a randomisation of the data to measure when the successful reassignment is due to the analysis and when it is due to random discrimination and it penalises the reassignment score by the number of PCs retained.
+
+```{r tutorial_6, fig.height=6, fig.width=8}
+temp1 <- optim.a.score(dapc1)
+
+dapc2 <- dapc(GBS, n.da=100, n.pca=100)
+temp2 <- optim.a.score(dapc2)
+
+
+scatter(dapc2, posi.da="topright", col=Titipounamu, scree.pca=TRUE, posi.pca="topleft", clab=0, cex = 3, solid = 0.6, leg= TRUE,
+#        txt.leg=paste("Cluster", 1:4), 
+        posi.leg = "bottomright")
+
+dapc3 <- dapc(GBS, n.da=2, n.pca=40)
+temp3 <- optim.a.score(dapc3)
+
+scatter(dapc3, posi.da="topright", col=Titipounamu, scree.pca=TRUE, posi.pca="topleft", clab=0, cex = 3, solid = 0.6, leg= TRUE,
+#        txt.leg=paste("Cluster", 1:4), 
+        posi.leg = "bottomright")
+dapc3
+```
+Checking the dapc3 outputs indicates that the first XX DAs are retained, and in total, this is capturing ~XX% of the total variance in the data.
+
