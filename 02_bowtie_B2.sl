@@ -1,10 +1,10 @@
 #!/bin/bash -e
 #SBATCH --job-name=bowtie_B2
 #SBATCH -A ga03186
-#SBATCH --time=01:00:00 # 04:00:00
-#SBATCH --mem=12G # 22G
-#SBATCH --cpus-per-task=12 # 6
-#SBATCH --array=1-96%8 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
+#SBATCH --time=00:20:00 # 04:00:00
+#SBATCH --mem=18G # 22G
+#SBATCH --cpus-per-task=14 # 6
+#SBATCH --array=1-26%8 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
 #SBATCH --out=%x.%j.out
 #SBATCH --err=%x.%j.err
 #SBATCH --mail-type=FAIL,END
@@ -32,7 +32,7 @@ module list
 refdir=/nesi/nobackup/ga03186/reference/
 reffile=GBS_scaffolds
 ref=$refdir$reffile
-samplist=/nesi/project/ga03186/ref/Weta_GBS_Batch2_filelist.txt
+samplist=/nesi/project/ga03186/ref/Weta_GBS_Batch2_filelist2.txt
 #INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch1/01_stacks_demux_adap/01b_B1_trimmed/
 #OUTSAM=/nesi/nobackup/ga03186/Weta_GBS_Batch1/02_bowtie_B1/SAM/
 #OUTBAM=/nesi/nobackup/ga03186/Weta_GBS_Batch1/02_bowtie_B1/BAM/
