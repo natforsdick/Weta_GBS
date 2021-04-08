@@ -40,7 +40,6 @@ samplist=/nesi/project/ga03186/ref/Weta_GBS_Batch2_filelist.txt
 INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/01_stacks_demux_PE/01b_PE_B2_trimmed/
 OUTSAM=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_PE_B2/SAM/
 OUTBAM=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_PE_B2/BAM/
-OUTSORT=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_PE_B2/02_bowtie_PE_B2_sorted/
 ###########
 
 if [ ! -e ${OUTSORT} ]; then
@@ -65,26 +64,26 @@ echo 'Aligning '${QUERY}
 # For paired-end reads:
 bowtie2 --very-sensitive-local --no-unal --threads 8 \
 -x $refdir$reffile \
--1 $QUERY.1_val_1.fq.gz -2 $QUERY.2_val_2.fq.gz -S $OUTSAM$QUERY.sam
+-1 ${INDIR}$QUERY.1_val_1.fq.gz -2 ${INDIR}$QUERY.2_val_2.fq.gz -S $OUTSAM$QUERY.sam
 
 # For single-end reads:
 #bowtie2 --very-sensitive-local --no-unal --threads 8 -x $refdir$reffile -U ${INDIR}${QUERY}.1_val_1.fq.gz -S ${OUTSAM}${QUERY}.sam
 
 echo 'Sorting '${QUERY}
-samtools view -bSh $OUTSAM$QUERY.sam | samtools sort - -o $OUTSORT$QUERY.sorted.bam
-samtools index ${OUTSORT}${QUERY}.sorted.bam
+samtools view -bSh $OUTSAM$QUERY.sam | samtools sort - -o $OUTBAM$QUERY.sorted.bam
+samtools index ${OUTBAM}${QUERY}.sorted.bam
   
    # Now let's grab some mapping stats:
     
-map=$(samtools view -F4 -c ${OUTSORT}$QUERY.sorted.bam)
-unmap=$(samtools view -f4 -c ${OUTSORT}${QUERY}.sorted.bam)
+map=$(samtools view -F4 -c ${OUTBAM}$QUERY.sorted.bam)
+unmap=$(samtools view -f4 -c ${OUTBAM}${QUERY}.sorted.bam)
 total=$(($map + $unmap))
 perc_mapped=`echo "scale=4;($map/$total)*100" | bc`
          
-echo "$QUERY.bam" >> ${OUTSORT}B2_bwa_mapping_stats.txt
-echo "mapped $map" >> ${OUTSORT}B2_bwa_mapping_stats.txt
-echo "perc_mapped $perc_mapped" >> ${OUTSORT}B2_bwa_mapping_stats.txt
-echo "unmapped $unmap" >> ${OUTSORT}B2_bwa_mapping_stats.txt
+echo "$QUERY.bam" >> ${OUTBAM}B2_bwa_mapping_stats.txt
+echo "mapped $map" >> ${OUTBAM}B2_bwa_mapping_stats.txt
+echo "perc_mapped $perc_mapped" >> ${OUTBAM}B2_bwa_mapping_stats.txt
+echo "unmapped $unmap" >> ${OUTBAM}B2_bwa_mapping_stats.txt
          
 echo "completed $QUERY"
 
