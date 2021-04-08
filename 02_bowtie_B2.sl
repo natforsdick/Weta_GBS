@@ -3,8 +3,8 @@
 #SBATCH -A ga03186
 #SBATCH --time=00:40:00 # 04:00:00
 #SBATCH --mem=18G # 22G
-#SBATCH --cpus-per-task=14 # 6
-#SBATCH --array=1-5%5 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
+#SBATCH --cpus-per-task=16 # 6
+#SBATCH --array=1-2%2 #-96%8# # 97-192%16 #1-100%20 #101-192%20 # Tailor to samp # - limited to 20 simultaneously.
 #SBATCH --out=%x.%j.out
 #SBATCH --err=%x.%j.err
 #SBATCH --mail-type=FAIL,END
