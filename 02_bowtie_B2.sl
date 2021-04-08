@@ -81,10 +81,10 @@ unmap=$(samtools view -f4 -c ${OUTSORT}${QUERY}.sorted.bam)
 total=$(($map + $unmap))
 perc_mapped=`echo "scale=4;($map/$total)*100" | bc`
          
-echo "$QUERY.bam" >> ${OUTSORT}B1_bwa_mapping_stats.txt
-echo "mapped $map" >> ${OUTSORT}B1_bwa_mapping_stats.txt
-echo "perc_mapped $perc_mapped" >> ${OUTSORT}B1_bwa_mapping_stats.txt
-echo "unmapped $unmap" >> ${OUTSORT}B1_bwa_mapping_stats.txt
+echo "$QUERY.bam" >> ${OUTSORT}B2_bwa_mapping_stats.txt
+echo "mapped $map" >> ${OUTSORT}B2_bwa_mapping_stats.txt
+echo "perc_mapped $perc_mapped" >> ${OUTSORT}B2_bwa_mapping_stats.txt
+echo "unmapped $unmap" >> ${OUTSORT}B2_bwa_mapping_stats.txt
          
 echo "completed $QUERY"
 
