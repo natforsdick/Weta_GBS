@@ -27,24 +27,23 @@ module list
 
 ############
 # PARAMS
-INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batchcombo_adap/03_stacks_sorted/ 
-OUTDIR=/nesi/nobackup/ga03186/Weta_GBS_Batchcombo_adap/04_ref_map/
+#INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batchcombo_adap/03_stacks_sorted/ 
+INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/02_bowtie_PE_B2/BAM/
+OUTDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/03_ref_map_PE/
 REF=/nesi/nobackup/ga03186/reference/
 list=/nesi/project/ga03186/ref/
-#refstack=Weta_GBS_Batch2_POP.txt
-#poplist="Het Mah Fallai 
-poplist="Mahoenui_all Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR"
-#poplist="Weta_GBS_Batch2_POP_SR"
+#poplist="Het Mah Fallai Mahoenui_all Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR"
+poplist="Weta_GBS_Batch2_POP Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR"
 ############
 for pop in $poplist
 do
-if [ ! -e ${OUTDIR}Weta_GBS_adap_${pop} ]; then
-mkdir -p ${OUTDIR}Weta_GBS_adap_${pop}
+if [ ! -e ${OUTDIR}${pop} ]; then
+mkdir -p ${OUTDIR}${pop}
 fi
 
-cd ${OUTDIR}Weta_GBS_adap_${pop}
+cd ${OUTDIR}${pop}
 
 echo "Running ref_map for ${pop}"
-srun ref_map.pl -T 10 --samples $INDIR --popmap ${list}${pop}.txt -o ${OUTDIR}Weta_GBS_adap_${pop}
+srun ref_map.pl -T 10 --samples $INDIR --popmap ${list}${pop}.txt -o ${OUTDIR}${pop}
 echo "Finished ref_map for ${pop}"
 done
