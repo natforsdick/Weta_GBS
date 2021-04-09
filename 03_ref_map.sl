@@ -33,8 +33,8 @@ OUTDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/03_ref_map_PE/
 REF=/nesi/nobackup/ga03186/reference/
 list=/nesi/project/ga03186/ref/
 #poplist="Het Mah Fallai Mahoenui_all Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR"
-#poplist="Weta_GBS_Batch2_POP Weta_GBS_Batch2_POP_MI 
-poplist="Weta_GBS_Batch2_POP_SR"
+#poplist="Weta_GBS_Batch2_POP Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR"
+poplist="Weta_GBS_Batch2_POP_noU"
 ############
 for pop in $poplist
 do
