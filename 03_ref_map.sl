@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #SBATCH -J ref_map
 #SBATCH -A ga03186
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --mem=3G
 #SBATCH --cpus-per-task=6
 #SBATCH --out=%x.%j.out
@@ -33,7 +33,8 @@ OUTDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/03_ref_map_PE/
 REF=/nesi/nobackup/ga03186/reference/
 list=/nesi/project/ga03186/ref/
 #poplist="Het Mah Fallai Mahoenui_all Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR"
-poplist="Weta_GBS_Batch2_POP Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR"
+#poplist="Weta_GBS_Batch2_POP Weta_GBS_Batch2_POP_MI 
+poplist="Weta_GBS_Batch2_POP_SR"
 ############
 for pop in $poplist
 do
