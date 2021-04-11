@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #SBATCH -J stacks_pop
 #SBATCH -A ga03186
-#SBATCH --time=01:30:00
+#SBATCH --time=01:00:00
 #SBATCH --mem=300M
 #SBATCH --cpus-per-task=4
 #SBATCH --out=%x.%j.out
@@ -25,7 +25,8 @@ module load Stacks/2.41-gimkl-2018b
 # PARAMS
 INDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/03_ref_map_PE/
 OUTDIR=/nesi/nobackup/ga03186/Weta_GBS_Batch2/04_populations_PE/
-poplist="Weta_GBS_Batch2_POP Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR Weta_GBS_Batch2_POP_noU"
+#poplist="Weta_GBS_Batch2_POP Weta_GBS_Batch2_POP_MI Weta_GBS_Batch2_POP_SR 
+poplist="Weta_GBS_Batch2_POP_noU"
 REFDIR=/nesi/project/ga03186/ref/
 ############
 which populations
