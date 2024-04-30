@@ -32,10 +32,11 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 2. [run_trimgalore_B2.sl](run_trimgalore_B2.sl) - Trim and adapter removal
 3. [run_bowtie2_index.sl](run_bowtie2_index.sl) - Index reference genome
 4. [02_bowtie_B2.sl](02_bowtie_B2.sl) - Map individual data, collect mapping statistics
-5. [04_stacks_populations_B2.sl](04_stacks_populations_B2.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
-6. [05_vcf2adegenet.sl](05_vcf2adegenet.sl) - Convert VCF to PLINK format for conversion to other formats for downstream processing
-7. Analysis of final SNP sets in R
-   a. Discriminant analysis of principal components and more with adegenet
-   b. Principal component analysis, Fst, and more with SNPRelate
-8. Analysis of final SNP sets with STRUCTURE
-9. Visualisation of combined STRUCTURE outputs in R with 
+5. [03_ref_map.sl](03_ref_map.sl) - Run Stacks _ref_map.pl_
+6. [04_stacks_populations_B2.sl](04_stacks_populations_B2.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
+7. [05_vcf2adegenet.sl](05_vcf2adegenet.sl) - Convert VCF to PLINK format for conversion to other formats for downstream processing
+8. Analysis of final SNP sets in R
+   * Discriminant analysis of principal components and more with adegenet
+   * Principal component analysis, Fst, and more with SNPRelate
+9. Analysis of final SNP sets with STRUCTURE
+10. Visualisation of combined STRUCTURE outputs in R with 
