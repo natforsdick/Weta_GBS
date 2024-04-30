@@ -2,9 +2,9 @@
 
 Developed by Nat Forsdick, 2021. This project is led and funded by [Manaaki Whenua - Landcare Research](https://landcareresearch.co.nz/).
 
-This repo contains scripts used to analyse single- and paired-end GBS data from weta species, including _Deinacrida heteracantha_, _D. fallai_, and _D. mahoenui_.
+This repo contains scripts used to analyse single- and paired-end genotyping-by-sequencing (GBS) data from weta species, including _Deinacrida heteracantha_, _D. fallai_, and _D. mahoenui_.
 
-This work is associated with Forsdick et al., _Population genomic analysis of Mahoenui giant wētā (Deinacrida mahoenui) reveals no reduction in genomic diversity following translocation_, _in progress_, focussing on _D. mahoenui_.
+This work is associated with Forsdick et al., _Population genomic analysis of Mahoenui giant wētā (Deinacrida mahoenui) reveals no reduction in genomic diversity following translocation_, (in progress), focussing on _D. mahoenui_.
 
 Scripts were originally run on the [NeSI](https://www.nesi.org.nz/) platform via SLURM workload manager, except for R scripts which were run locally. 
 
@@ -23,3 +23,7 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 * R v4.3.1
   * adegenet v2.1.3
   * SNPRelate v1.34.1 
+
+## Pipeline
+
+1. [stacks_process_radtags.sl](stacks_process_radtags.sl) Demultiplexing paired-end GBS with Stacks _process_radtags_.
