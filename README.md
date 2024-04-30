@@ -28,12 +28,12 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 
 ## Pipeline
 
-1. [](stacks_process_radtags.sl) - Demultiplex raw paired-end GBS with Stacks _process_radtags_.
-2. [](run_trimgalore_B2.sl) - Trim and adapter removal
-3. [](run_bowtie2_index.sl) - Index reference genome
-4. [](02_bowtie_B2.sl) - Map individual data, collect mapping statistics
-5. [](04_stacks_populations_B2.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
-6. [](05_vcf2adegenet.sl) - Convert VCF to PLINK format for conversion to other formats for downstream processing
+1. [stacks_process_radtags.sl](stacks_process_radtags.sl) - Demultiplex raw paired-end GBS with Stacks _process_radtags_.
+2. [run_trimgalore_B2.sl](run_trimgalore_B2.sl) - Trim and adapter removal
+3. [run_bowtie2_index.sl](run_bowtie2_index.sl) - Index reference genome
+4. [02_bowtie_B2.sl](02_bowtie_B2.sl) - Map individual data, collect mapping statistics
+5. [04_stacks_populations_B2.sl](04_stacks_populations_B2.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
+6. [05_vcf2adegenet.sl](05_vcf2adegenet.sl) - Convert VCF to PLINK format for conversion to other formats for downstream processing
 7. Analysis of final SNP sets in R
    a. Discriminant analysis of principal components and more with adegenet
    b. Principal component analysis, Fst, and more with SNPRelate
