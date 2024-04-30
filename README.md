@@ -36,7 +36,7 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 6. [04_stacks_populations_B2.sl](04_stacks_populations_B2.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
 7. [05_vcf2adegenet.sl](05_vcf2adegenet.sl) - Convert VCF to PLINK format for conversion to other formats for downstream processing
 8. Analysis of final SNP sets in R
-   * Discriminant analysis of principal components and more with adegenet
-   * Principal component analysis, Fst, and more with SNPRelate
-9. Analysis of final SNP sets with STRUCTURE
+   * []() - Discriminant analysis of principal components and more with adegenet
+   * []() - Principal component analysis, Fst, and more with SNPRelate
+9. [06_structure.sl](06_structure.sl) - Analysis of final SNP sets with STRUCTURE
 10. Visualisation of combined STRUCTURE outputs in R with 
