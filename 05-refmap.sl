@@ -1,13 +1,10 @@
 #!/bin/bash -e
 #SBATCH -J ref_map
-#SBATCH -A ga03048
 #SBATCH --time=01:30:00
 #SBATCH --mem=3G
 #SBATCH --cpus-per-task=12
 #SBATCH --out=%x.%j.out
 #SBATCH --err=%x.%j.err
-#SBATCH --mail-type=FAIL,END
-#SBATCH --mail-user=forsdickn@landcareresearch.co.nz
 
 ###########
 # 03_ref_map.sl
@@ -20,16 +17,15 @@
 ###########
 # MODULES
 module purge
-#module load Stacks/2.41-gimkl-2018b
 module load Stacks/2.65-GCC-11.3.0
 module list
 ############
 
 ############
 # PARAMS
-INDIR=/nesi/nobackup/ga03048/Weta_GBS_Batch2/03_bowtie/BAM/
-OUTDIR=/nesi/nobackup/ga03048/Weta_GBS_Batch2/03_ref_map_PE/
-list=/nesi/project/ga03186/ref/
+INDIR=/path/to/03_bowtie/BAM/
+OUTDIR=/path/to/03_ref_map_PE/
+list=/path/to/ref/
 poplist="Weta_GBS_Batch2_all"
 ############
 for pop in $poplist
