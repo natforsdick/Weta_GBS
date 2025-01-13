@@ -2,7 +2,7 @@
 
 Developed by Nat Forsdick, 2021. This project is led by [Manaaki Whenua - Landcare Research](https://landcareresearch.co.nz/), and funded by the New Zealand Ministry of Business, Innovation and Employment through New Zealand's Biological Heritage National Science Challenge and the Strategic Science Investment Fund for Crown Research Institutes, with support from [Genomics Aotearoa](https://www.genomics-aotearoa.org.nz/).
 
-This repo contains scripts used to analyse paired-end genotyping-by-sequencing (GBS) data from Mahoenui giant wētā, __Deinacrida mahoenui_.
+This repo contains scripts used to analyse paired-end genotyping-by-sequencing (GBS) data from Mahoenui giant wētā, _Deinacrida mahoenui_.
 
 This work is associated with the publication: Forsdick et al., 2025. 'Population genomic analysis of Mahoenui giant wētā (_Deinacrida mahoenui_) reveals minimal reduction in genomic diversity following translocation'. Insect Conservation and Diversity. DOI: [10.1111/icad.12810](https://doi.org/10.1111/icad.12810)
 
