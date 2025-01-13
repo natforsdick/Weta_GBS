@@ -1,13 +1,10 @@
 #!/bin/bash -e
 #SBATCH -J stacks_pop
-#SBATCH -A ga03048
 #SBATCH --time=00:10:00
 #SBATCH --mem=200M
 #SBATCH --cpus-per-task=2
 #SBATCH --out=%x.%j.out
 #SBATCH --err=%x.%j.err
-#SBATCH --mail-type=FAIL,END
-#SBATCH --mail-user=forsdickn@landcareresearch.co.nz
 
 ############
 # 04_stacks_populations.sl
@@ -23,11 +20,10 @@ module load Stacks/2.65-GCC-11.3.0
 
 ############
 # PARAMS
-INDIR=/nesi/nobackup/ga03048/Weta_GBS_Batch2/03_ref_map_PE/Weta_GBS_Batch2_all/
-OUTDIR=/nesi/nobackup/ga03048/Weta_GBS_Batch2/03_ref_map_PE/all2/
+INDIR=/path/to/03_ref_map_PE/Weta_GBS_Batch2_all/
+OUTDIR=/path/to/03_ref_map_PE/all2/
 
-#POPMAP=/nesi/project/ga03186/ref/Weta_GBS_Batch2_POP_blankrem.txt
-POPMAP=/nesi/project/ga03186/ref/Weta_GBS_Batch2_all.txt
+POPMAP=/path/to/ref/Weta_GBS_Batch2_all.txt
 ############
 
 which populations
