@@ -1,6 +1,5 @@
 #!/bin/bash -e
 #SBATCH --job-name=trim_B2
-#SBATCH -A ga03048
 #SBATCH --time=00:06:00
 #SBATCH --mem=400M
 #SBATCH --cpus-per-task=4
@@ -17,12 +16,12 @@
 ###########
 # PARAMS  #
 ###########
-cutadapt=/opt/nesi/mahuika/cutadapt/2.3-gimkl-2018b-Python-3.7.3/bin/cutadapt
-INDIR1=/nesi/nobackup/ga03048/Weta_GBS_Batch2/01_stacks_demux_PE2/
-samplist=/nesi/project/ga03048/data/weta-GBS/Weta_GBS_Batch2_filelist.txt
+cutadapt=/path/to/cutadapt/2.3-gimkl-2018b-Python-3.7.3/bin/cutadapt
+INDIR1=/path/to/01_stacks_demux_PE2/
+samplist=/path/to/weta-GBS/Weta_GBS_Batch2_filelist.txt
 
-OUTDIR1=/nesi/nobackup/ga03048/Weta_GBS_Batch2/01_stacks_demux_PE2/02_trimmed_PE2/
-QC1=/nesi/nobackup/ga03048/Weta_GBS_Batch2/01_stacks_demux_PE2/02_trimmed_PE2/QC/
+OUTDIR1=/path/to/01_stacks_demux_PE2/02_trimmed_PE2/
+QC1=/path/to/01_stacks_demux_PE2/02_trimmed_PE2/QC/
 ###########
 
 ###########
