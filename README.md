@@ -6,6 +6,8 @@ This repo contains scripts used to analyse paired-end genotyping-by-sequencing (
 
 This work is associated with the publication: Forsdick et al., 2025. 'Population genomic analysis of Mahoenui giant wētā (_Deinacrida mahoenui_) reveals minimal reduction in genomic diversity following translocation'. Insect Conservation and Diversity. DOI: [10.1111/icad.12810](https://doi.org/10.1111/icad.12810)
 
+![20241122-graph-abstract-draft](https://github.com/user-attachments/assets/439d45e4-cb5e-4f52-816f-7cff3b93dfbb)
+
 Scripts were run on the [NeSI](https://www.nesi.org.nz/) platform via SLURM workload manager, except for `R` scripts which were run locally. 
 
 The workflow moves through demultiplexing, quality control, and mapping, before processing through `Stacks` _ref_map_ and _populations_ pipelines after which data are output in formats for analysis via genetics packages such as `adegenet` and `SNPRelate` in `R`, and `FastSTRUCTURE`. 
