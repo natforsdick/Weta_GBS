@@ -7,7 +7,7 @@ output:
   html_document: default
 ---
 
-This supplementary file to the manuscript '*Population genomic analysis of Mahoenui giant wētā (*Deinacrida mahoenui*) reveals minimal reduction in genomic diversity following translocation*' (Forsdick et al. 2024) presents the output of SNP filtering and downstream analyses, predominantly using the SNPfiltR package. 
+This supplementary file to the manuscript '*Population genomic analysis of Mahoenui giant wētā (*Deinacrida mahoenui*) reveals minimal reduction in genomic diversity following translocation*' (Forsdick et al. 2025) presents the output of SNP filtering and downstream analyses, predominantly using the SNPfiltR package. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE, fig.width = 7, fig.height = 6, ppi=200)
@@ -30,9 +30,9 @@ mwlrcols <- c("#88cfa8",  "cornflowerblue", "#898a8d")
 Get vcf `populations-all2.snps.vcf`, and file encoding populations `Weta_GBS_Batch2_POP_blankrem.txt`.
 
 ```{r}
-vcf <- read.vcfR("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/populations-all2.snps.vcf")
+vcf <- read.vcfR("/path/to/Weta-GBS/2024-11-01-Results/populations-all2.snps.vcf")
 
-pop_code <- read.delim("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/Weta_GBS_Batch2_POP_blankrem.txt", sep="\t", header=F)
+pop_code <- read.delim("/path/to/Weta-GBS/2024-11-01-Results/Weta_GBS_Batch2_POP_blankrem.txt", sep="\t", header=F)
 colnames(pop_code) <- c("id", "pop")
 ```
 
@@ -171,20 +171,20 @@ Then we can thin the variants to only a single SNP per 500 bp, and write out the
 
 ```{r }
 #write out vcf with all SNPs
-vcfR::write.vcf(vcf.snpmiss60.mac2, "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac2.vcf.gz")
+vcfR::write.vcf(vcf.snpmiss60.mac2, "/path/to/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac2.vcf.gz")
 
 #linkage filter vcf to thin SNPs to one per 500bp
 vcfR.thin<-distance_thin(vcf.snpmiss60.mac2, min.distance = 500)
 
 
 #write out vcf with thinned SNPs
-vcfR::write.vcf(vcfR.thin, "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac2.thin.vcf.gz")
+vcfR::write.vcf(vcfR.thin, "/path/to/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac2.thin.vcf.gz")
 
 
 #linkage filter vcf to thin SNPs to one per 500bp
 vcfR.thin3<-distance_thin(vcf.snpmiss60.mac3, min.distance = 500)
 #write out vcf with thinned SNPs
-vcfR::write.vcf(vcfR.thin3, "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf.gz")
+vcfR::write.vcf(vcfR.thin3, "/path/to/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf.gz")
 
 ```
 
@@ -192,20 +192,19 @@ vcfR::write.vcf(vcfR.thin3, "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-G
 
 ```{r}
 ## adding outlier analysis - results of BayeScan for SNPs under selection
-source("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/plot_R.r")
+source("/path/to/Weta-GBS/2024-11-01-Results/bayescan-out/plot_R.r")
 
-plot_bayescan("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/out-weta.snpmiss60.mac3.thin.bayes_fst.txt", FDR=0.05)
+plot_bayescan("/path/to/Weta-GBS/2024-11-01-Results/bayescan-out/out-weta.snpmiss60.mac3.thin.bayes_fst.txt", FDR=0.05)
 
-#tiff("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/bayescan-outliers.tiff", compression = "lzw", units = "in", width=5, height = 5, res = 400)
-#plot_bayescan("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/out-weta.snpmiss60.mac3.thin.bayes_fst.txt", FDR=0.05)
+#tiff("/path/to/Weta-GBS/2024-11-01-Results/bayescan-out/bayescan-outliers.tiff", compression = "lzw", units = "in", width=5, height = 5, res = 400)
+#plot_bayescan("/path/to/Weta-GBS/2024-11-01-Results/bayescan-out/out-weta.snpmiss60.mac3.thin.bayes_fst.txt", FDR=0.05)
 #dev.off()
 ```
-
 
 We used BayeScan to screen the VCF for putative SNPs under selection. The figure above shows the results of this analysis, plotted using the `plot_bayescan` function, to identify outlier SNPs.  
 
 Below we reproduce the plots of fastSTRUCTURE results where individuals are ordered by 1) sex, and 2) colour. In these plots, each vertical line represents one individual, coloured according to cluster assignment, when _K_ = 3. We do not reproduce the plots for _K_ = 2, as no population structure was identified. There does not appear to be any association between weak population structure and either of these characteristics. 
 
-![Sex]("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/FastStructure/figures/CLUMPP_merged_k3_sex.png"){width="120%"}
+![Sex]("/path/to/Weta-GBS/2024-11-01-Results/FastStructure/figures/CLUMPP_merged_k3_sex.png"){width="120%"}
 
-![Colour]("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/FastStructure/figures/CLUMPP_merged_k3_sex.png"){width="120%"}
+![Colour]("/path/to/Weta-GBS/2024-11-01-Results/FastStructure/figures/CLUMPP_merged_k3_sex.png"){width="120%"}
