@@ -10,7 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_knit$set(root.dir = "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/FastStructure", echo = TRUE,
+knitr::opts_knit$set(root.dir = "/path/to/Weta-GBS/2024-11-01-Results/FastStructure", echo = TRUE,
                      dev='tiff', fig.path='./figures/', dpi=300, units="in", fig.height=7, fig.width=10, 
                      cache=FALSE)
 #rm(list = ls(all.names = TRUE))
@@ -165,7 +165,7 @@ Ran these through CLUMPP. This should provide support for the most appropriate *
 for file in Faststr_filt_K*/
 do
   cd $file
-  "/mnt/c/Users/ForsdickN/OneDrive - MWLR/Desktop/CLUMPP_Windows.1.1.2/CLUMPP.exe" paramfile
+  "/path/to/CLUMPP_Windows.1.1.2/CLUMPP.exe" paramfile
   cd ../
 done
 ```
@@ -228,7 +228,6 @@ plotQ(merged3, grplab=popcode, subsetgrp=c("MI","MGWSR"), selgrp="Population", o
       grplabangle = 35, grplabsize = 1, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
       grplabheight = 0.2, 
              barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
-
 
 ```
 
