@@ -1,4 +1,4 @@
-# Wētā genotyping by sequencing analysis
+# Mahoenui giant wētā population genomics
 
 Developed by Nat Forsdick, 2021. This project is led by [Manaaki Whenua - Landcare Research](https://landcareresearch.co.nz/), and funded by the New Zealand Ministry of Business, Innovation and Employment through New Zealand's Biological Heritage National Science Challenge and the Strategic Science Investment Fund for Crown Research Institutes, with support from [Genomics Aotearoa](https://www.genomics-aotearoa.org.nz/).
 
