@@ -20,11 +20,16 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 * SAMtools v1.9
 * VCFtools v0.1.15
 * PLINK v1.09b6.16
+* BayeScan v2.1
 * [fastStructure]() v1.0
-* R v4.3.1
-  * [adegenet](https://cran.r-project.org/web/packages/adegenet/index.html) v2.1.3
-  * [SNPRelate](https://github.com/zhengxwen/SNPRelate) v1.34.1
+* NeEstimator v2.1
+* CLUMPP v1.1.2
+* R v4.4.0
+  * [SNPfiltR]() v1.0.1
+  * [adegenet](https://cran.r-project.org/web/packages/adegenet/index.html) v2.1.10
+  * [SNPRelate](https://github.com/zhengxwen/SNPRelate) v1.38.0
   * [pophelper](https://github.com/royfrancis/pophelper) v2.3.1
+  * PopGenReport v3.1
 
 ## Pipeline
 
@@ -33,10 +38,11 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 3. [03-bowtie-index-ref.sl](03-bowtie-index-ref.sl) - Index the Poor Knights giant wētā reference genome assembly
 4. [04-bowtie-align.sl](04-bowtie-align.sl) - Align individual data to the reference genome assembly, collect mapping statistics
 5. [05-refmap.sl](05-refmap.sl) - Run Stacks _ref_map.pl_
-6. [06-stacks-popns.sl](06-stacks-popns.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
+6. [06-stacks-popns.sl](06-stacks-popns.sl) - Call and filter variants and collect preliminary statistics 
 7. [07-export-format.sh](07-export-format.sh) - Convert VCF to various formats for downstream processing
-8. Analysis of final SNP sets in R
-   * []() - Discriminant analysis of principal components and more with adegenet
-   * []() - Principal component analysis, Fst, and more with SNPRelate
-9. [08-faststructure.sl](08-faststructure.sl) - Analysis of final SNP sets with fastSTRUCTURE
-10. Visualisation of combined STRUCTURE outputs in R with 
+8. [SNP-filtering.Rmd](SNP-filtering.Rmd) - Additional SNP filtering analysis
+9. Population genomic analyses:
+   * [PCA-popgen.Rmd](PCA-popgen.Rmd) - PCA, Fst, and more
+   * [08-faststructure.sl](08-faststructure.sl) - population structure analysis
+   * [fastStructure-viz.Rmd](fastStructure-viz.Rmd) - visualisation of the results of population structure analysis
+
