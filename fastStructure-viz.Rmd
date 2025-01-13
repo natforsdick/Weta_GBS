@@ -1,0 +1,266 @@
+---
+title: "PopHelper analysis of FastStructure results"
+author: "Natalie Forsdick"
+date: "17/09/2024"
+header-includes:
+    - \usepackage{setspace}\doublespacing
+output:
+  html_document: 
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/FastStructure", echo = TRUE,
+                     dev='tiff', fig.path='./figures/', dpi=300, units="in", fig.height=7, fig.width=10, 
+                     cache=FALSE)
+#rm(list = ls(all.names = TRUE))
+getwd()
+
+```
+
+```{r packages, include=FALSE}
+# Commented code is what had to be set up initially to load pophelper:
+#remove.packages('ggplot2')
+#install devtools package from CRAN
+#install.packages('devtools',dependencies=T)
+#library(devtools) # may need to run this but will check first
+
+#install pophelper package from GitHub:
+#install_github('royfrancis/pophelper', force=TRUE)
+
+#load library for use
+library('pophelper')
+packageDescription("pophelper", fields="Version")
+R.version
+#library(RColorBrewer)
+library(tidyr)
+
+```
+
+```{r colours, include=FALSE}
+# Set colours for plots
+#greenbluegrey <- c("#6F808C", "#70CFAE", "#29AB7D","#CECECE", "#32D199","#28B0D1","#143A8B",  "#F0A156", "#5B88C1","#C05E23", "#99B5DC", "#F7B969")
+greenbluegrey <- c("#009cbd", "#de7c00", "#b7db57", "#64a70b",  "#00c1d5", "#ebb700", "#32D199", "#5B88C1", "purple", "#C05E23")
+
+oranges <- c("#de7c00","#ebb700","#C05E23")
+```
+
+Here we use the `R` package `PopHelper` to plot the outputs of FastStructure. 
+
+Prior to importing our data, we have to do some pre-processing to ensure iteration numbers are appended to file names, and that all *Q* files are in the same directory. We also want to extract our CVs so we can identify the most appropriate *k*-values. This pre-processing uses the command line and is described in Step 7 of 'Streamlined_GBS_pipeline.md'.
+
+## Assess CV to determine the most appropriate number of clusters
+
+This requires all CVs to be extracted and sorted by *k*, in a single file `admixture_CV_sorted.txt`. 
+
+```{r CV_values, echo = FALSE}
+# Import data file
+cvfile <- read.table(file="faststr_cv.txt",header= FALSE, sep= "\t", stringsAsFactors = FALSE)
+
+# name headers
+names(cvfile) <- c("k","CV")
+
+head(cvfile)
+```
+
+```{r CV_values_means, echo = FALSE}
+# To generate group-specific means we can use aggregate function
+cvfile_means <- aggregate(cvfile[,2], list(cvfile$k), mean)
+cvfile_means
+```
+
+```{r CV_values_plot, fig.height=4, fig.width=6, echo = FALSE}
+# can we plot without having a manual step of adding means to the file?
+library(ggplot2)
+library(forcats)
+# using forcats function 'fct_inseq' to order x axis numerically after grouping as factors
+
+# Then plot of CV by k.
+tiff("./figures/Figure3.2.tiff", compression = "lzw", units="in", width=5, height=4.5, res=400)
+ggplot(cvfile, aes(fct_inseq(factor(k), ordered = NA), CV, group = 1)) +
+  geom_point(colour="grey") +
+  geom_line(stat = "summary", fun = "mean", linewidth=1)+
+  theme_bw() +
+  labs(x="K", y="CV error")
+dev.off()
+```
+
+
+Now we can identify our most appropriate *K* value using this plot. For this first SNP set, k = 2 is most appropriate. 
+
+Hm, but somewhere else you must have the code to do the actual Evanno method plots for all.
+
+Next we can import our *Q* files to `PopHelper`, and begin plotting.
+First, make a list of files to include.
+
+```{r make_Qlist}
+q1<- list.files(path="./", pattern = c("*.meanQ"), full.names=T)
+
+# Check files are correct:
+head(q1)
+```
+
+Create a list
+
+```{r make_Qlist2}
+alist <- readQ(files=q1, indlabfromfile=T)
+as.qlist(alist)
+
+```
+
+We need a txt file containing the population information for individuals 'admix_filt_indiv.txt'. 
+
+```{r confirm_Qlist2}
+# Had some issues later with k or ind labels not set properly, so using this to try and solve that problem.
+q2 <- as.qlist(alist)
+#head(q2)
+is.qlist(q2)
+
+popcode <- read.delim("../weta.snpmiss60.mac3.thin_grouplab.txt", header=T, stringsAsFactors=F)
+#head(popcode)
+
+# Tabulate Q files, and make a table
+tr1 <- tabulateQ(q2, writetable=F)
+#tr1
+# Summarise Q files, collapsing replicate runs
+sr1 <- summariseQ(tr1)
+#head(sr1)
+
+#summariseQ(tr1, writetable=TRUE)
+```
+
+Next create an initial unaligned plot, just to check that everything imported and is running as expected.
+
+```{r test_plot, eval=FALSE, fig.height=10, fig.width=6, include=FALSE}
+p1 <- plotQ(q2[c(1:10)], imgoutput="join", returnplot=T, exportplot=T, outputfilename="test_plot", imgtype="tiff", basesize=11, exportpath="./figures/")
+
+plotQ(q2[c(1:10)],imgoutput="join",showindlab=T,useindlab=T,height=7,width=70,grplabangle=0,ordergrp=T,basesize=11,returnplot=T, exportplot=T,  outputfilename="test_plot",imgtype="tiff",exportpath="./figures/")
+p1
+```
+
+
+
+Now this works for a set with the same *K* value - what happens if we do it for all data?
+
+```{r align_all, fig.height=16, fig.width=8, echo = FALSE}
+alist2 <- alignK(q2)
+```
+
+
+```{r align_all2, eval=FALSE, fig.height=11, fig.width=8, include=FALSE}
+plotQ(alist2, imgoutput="join", returnplot=T, showindlab=F, grplab=popcode, exportplot=T, outputfilename="align_all2", imgtype="tiff", basesize=12, exportpath="./figures/",
+      clustercol=greenbluegrey,
+      height=1, indlabsize=2, indlabheight=0.08, indlabspacer=-1)
+```
+
+We then convert to CLUMPP format. 
+
+```{r clumpp_output, eval=FALSE, include=FALSE}
+clumppExport(qlist=q2, prefix="Faststr_filt",exportpath=getwd())
+```
+
+Ran these through CLUMPP. This should provide support for the most appropriate *K* value determined above. 
+
+```{bash eval=F}
+for file in Faststr_filt_K*/
+do
+  cd $file
+  "/mnt/c/Users/ForsdickN/OneDrive - MWLR/Desktop/CLUMPP_Windows.1.1.2/CLUMPP.exe" paramfile
+  cd ../
+done
+```
+
+
+Results:
+
+| K  | 2 | 3 | 4 | 5 | 
+| H' | 1 | 0.4565 | 0.3881 | 0.4121 | 
+
+So we are looking for the K value that gives the highest H' value. 
+
+If required, you can plot your merged files for comparison. 
+
+```{r clumpp_results, echo=FALSE, fig.height=5, fig.width=10}
+aligned <- readQ("./Faststr_filt_K2/Faststr_filt_K2-combined-aligned.txt")
+```
+
+```{r clumpp_aligned_plot, echo=FALSE, fig.height=20, fig.width=10}
+plotQ(aligned, imgoutput="join", grplab=popcode, subsetgrp=c("MI","MGWSR"), selgrp="Population", ordergrp=T, clustercol=greenbluegrey, outputfilename="clumpped_k2", exportpath=getwd())
+```
+
+```{r clumpp_merged, echo=FALSE}
+
+merged2 <- readQ("./Faststr_filt_K2/Faststr_filt_K2-combined-merged.txt")
+merged3 <- readQ("./Faststr_filt_K3/Faststr_filt_K3-combined-merged.txt")
+
+```
+
+```{r clumpp_merged_plot1, echo=FALSE, fig.height=5, fig.width=10}
+popcode1 <- read.delim("../weta.snpmiss60.mac3.thin-pop.txt", header=F, stringsAsFactors=F)
+plotQ(merged2, grplab=popcode1, subsetgrp=c("MI","MGWSR"), selgrp="V2", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k2-pop",imgtype="tiff", exportpath = "./figures/", basesize=8, 
+      grplabangle = 0, grplabsize = 1.4, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+
+plotQ(merged3, grplab=popcode1, subsetgrp=c("MI","MGWSR"), selgrp="V2", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k3-pop", imgtype="tiff", exportpath ="./figures/", basesize=8, 
+      grplabangle = 0, grplabsize = 1.4, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+```
+
+
+```{r clumpp_merged_plot2, echo=FALSE, fig.height=5, fig.width=10}
+
+plotQ(merged2, grplab=popcode,subsetgrp=c("MI","MGWSR"), selgrp="Population", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k2",imgtype="tiff", exportpath = "./figures/", basesize=8, 
+      grplabangle = 35, grplabsize = 1, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+
+plotQ(merged3, grplab=popcode, subsetgrp=c("MI","MGWSR"), selgrp="Population", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k3", imgtype="tiff", exportpath ="./figures/", basesize=8, 
+      grplabangle = 35, grplabsize = 1, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+
+
+```
+
+```{r clumpp_merged_sex_col, echo=FALSE, fig.height=5, fig.width=10}
+# had to change image output format to png, as can't seem to read a tiff into Rmarkdown when building supplementary
+
+plotQ(merged2, grplab=popcode,subsetgrp=c("M","F"), selgrp="Sex", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k2_sex",imgtype="png", exportpath = "./figures/", basesize=8, 
+      grplabangle = 35, grplabsize = 1, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+
+plotQ(merged3, grplab=popcode,subsetgrp=c("M","F"), selgrp="Sex", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k3_sex",imgtype="png", exportpath = "./figures/", basesize=8, 
+      grplabangle = 35, grplabsize = 1, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+
+plotQ(merged2, grplab=popcode, subsetgrp=c("Dark","Light", "Yellow"), selgrp="Colour", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k2_col", imgtype="png", exportpath ="./figures/", basesize=8, 
+      grplabangle = 35, grplabsize = 1, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+
+plotQ(merged3, grplab=popcode, subsetgrp=c("Dark","Light", "Yellow"), selgrp="Colour", ordergrp=T,
+      showindlab = F,
+      showlegend=F, exportplot=T, outputfilename="CLUMPP_merged_k3_col", imgtype="png", exportpath ="./figures/", basesize=8, 
+      grplabangle = 35, grplabsize = 1, splabsize = 3, divtype = 1, divsize = 0.2, panelspacer = 0.06, grplabspacer = -0.2, linesize = 0.3,
+      grplabheight = 0.2, 
+             barbordercolour="white", barbordersize=0.01, clustercol=oranges, height=4, dpi=500)
+```
+

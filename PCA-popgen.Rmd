@@ -1,0 +1,383 @@
+---
+title: "SNPRelate_test"
+author: "Nat Forsdick"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document: 
+    keep_md: TRUE
+---
+
+Run on Linux system
+
+```{r setup, include=T}
+knitr::opts_knit$set(dev = "tiff", echo = TRUE,ppi=300,units="in", out.height="7", out.width="9", cache = TRUE)
+
+getwd()
+```
+
+## SNPRelate for PCA
+
+```{r install_packages, include=F, eval=F}
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("gdsfmt")
+BiocManager::install("SNPRelate")
+BiocManager::install("gdsfmt")
+BiocManager::install("MASS")
+install.packages("pals")
+install.packages("here")
+here::here()
+```
+
+```{r libraries, echo=FALSE}
+#install.packages("SNPRelate")
+
+library(gdsfmt)
+library(SNPRelate)
+library(MASS)
+library(RColorBrewer)
+#library("Manu")
+library(pals)
+library('gridExtra')
+library(vcfR)
+```
+
+```{r session, echo=FALSE}
+sessionInfo()
+
+citation("gdsfmt")
+citation("SNPRelate")
+citation("MASS")
+```
+
+```{r colours}
+#Titipounamu <- get_pal("Titipounamu")
+#palette(Titipounamu)
+# Create a gradient of colours between the selected colours
+#selected_colours <- get_pal("Titipounamu")[c(3,5,6,2)]
+selected_colours <- c("#009cbd", "#ebb700", "#de7c00")
+color.gradient <- function(x, colors=selected_colours, colsteps=100) {
+  return( colorRampPalette(colors) (colsteps) [ findInterval(x,
+                seq(min(x),max(x), length.out=colsteps)) ] )
+}
+x <- c(1:50)
+
+#selected_colours2 <- get_pal("Titipounamu")[c(1,5)]
+selected_colours2 <- c("#009cbd", "#de7c00")
+color.gradient2 <- function(x, colors=selected_colours2, colsteps=100) {
+  return( colorRampPalette(colors) (colsteps) [ findInterval(y,
+                seq(min(y),max(y), length.out=colsteps)) ] )
+}
+y <- c(1:50)
+
+mwlrcols <- c("#00c1d5","#64a70b", "#009cbd",  "#b7db57", "#de7c00", "#ebb700")
+oranges <- c("#de7c00","#ebb700","#C05E23")
+```
+
+```{r import_vcfs}
+# check vcf is not zipped
+vcf.fn <- "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf"
+
+#file.size(vcf.fn)
+#vcf_test1 <- read.vcfR(vcf.fn)
+snpgdsVCF2GDS("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf", "test.gds", method="biallelic.only")
+
+snpgdsSummary("test.gds")
+
+```
+
+```{r sanity_check}
+# Open the GDS file
+genofile <- snpgdsOpen("test.gds")
+
+head(genofile)
+```
+
+```{r get_pop}
+# Get population information
+#pop_code <- scan("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin-pop.txt",
+#                 what=character())
+pop_code <- read.delim("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin-pop.txt", sep="\t", header=F)
+table(pop_code)
+
+# Display the first six values
+head(pop_code)
+
+# Get sample id
+sample.id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+sample.id
+# assume the order of sample IDs is as the same as population codes
+head(cbind(sample.id, pop_code$V2))
+```
+
+
+```{r PCA}
+population <- as.factor(pop_code$V2)
+pca <- snpgdsPCA(genofile, num.thread=4,autosome.only=F)
+
+# variance proportion (%)
+pc.percent <- pca$varprop*100
+head(round(pc.percent, 2))
+
+# Make the data frame
+tab <- data.frame(sample.id = pca$sample.id,
+    pop = factor(pop_code$V2)[match(pca$sample.id, sample.id)],
+    EV1 = pca$eigenvect[,1],    # the first eigenvector
+    EV2 = pca$eigenvect[,2],    # the second eigenvector
+    stringsAsFactors = FALSE)
+head(tab)
+
+# Draw
+legend.cols = as.factor(oranges[tab$pop])
+
+plot(tab$EV2, tab$EV1, pch=16, col=(oranges)[as.integer(tab$pop)], 
+     xlab="Eigenvector 2 (2.4%)", ylab="Eigenvector 1 (3.0%)")
+legend("bottomright", legend=levels(tab$pop), 
+       pch=16, col=levels(legend.cols))
+
+tiff("Figure2.tiff", compression = "lzw", units="in", width=6, height=4, res=400)
+plot(tab$EV2, tab$EV1, pch=16, col=(oranges)[as.integer(tab$pop)], 
+     xlab="Eigenvector 2 (2.4%)", ylab="Eigenvector 1 (3.0%)")
+legend("bottomright", legend=levels(tab$pop), 
+       pch=16, col=levels(legend.cols))
+dev.off()
+
+lbls <- paste("PC", 1:5, "\n", format(pc.percent[1:5], 
+                                      digits=2), "%", sep="")
+pairs(pca$eigenvect[,1:5], pch=16, col=(oranges)[as.integer(tab$pop)], labels=lbls)
+legend("topleft", legend=levels(tab$pop), 
+       pch=16, col=levels(legend.cols))
+
+lbls <- paste("PC", 1:2, "\n", format(pc.percent[1:2], 
+                                      digits=2), "%", sep="")
+pairs(pca$eigenvect[,1:2], pch=16, col=(oranges)[as.integer(tab$pop)], labels=lbls)
+legend("topleft", legend=levels(tab$pop), 
+       pch=16, col=levels(legend.cols))
+
+tiff("Figure2.2.tiff", compression = "lzw", units="in", width=6, height=4, res=400)
+pairs(pca$eigenvect[,1:2], pch=16, col=(oranges)[as.integer(tab$pop)], labels=lbls)
+legend("topleft", legend=levels(tab$pop), 
+       pch=16, col=levels(legend.cols))
+dev.off()
+```
+
+Parallel coordinates plot for the top principal components:
+```{r top_PCs}
+datpop <- factor(pop_code$V2)[match(pca$sample.id, sample.id)]
+
+levelcol <- levels(datpop)
+parcoord(pca$eigenvect[,1:16], col=oranges[datpop])
+legend("topleft", legend=levels(datpop), 
+       pch=16, col=(oranges)[as.factor(levelcol)])
+
+```
+
+To calculate the SNP correlations between eigenvectors and SNP genotypes:
+```{r get_corr}
+palette(alphabet2())
+# Get chromosome index
+chr <- read.gdsn(index.gdsn(genofile, "snp.chromosome"))
+CORR <- snpgdsPCACorr(pca, genofile, eig.which=1:4)
+
+savepar <- par(mfrow=c(2,1), mai=c(0.45, 0.55, 0.1, 0.25))
+
+for (i in 1:2)
+{
+    plot(abs(CORR$snpcorr[i,]), ylim=c(0,1), xlab="",
+         ylab=paste("PC", i),
+         col=1:length(chr), pch="+")
+}
+```
+
+Can also do Weir-Cockerham Fst
+```{r fst}
+flag <- pop_code$V2 %in% c("MI", "SR")
+samp.sel <- sample.id[flag]
+pop.sel <- pop_code$V2[flag]
+v <- snpgdsFst(genofile, sample.id=samp.sel, population=as.factor(pop.sel),
+    method="W&C84", autosome.only=F)
+
+# Weir and Cockerham weighted Fst estimate
+v$Fst 
+# Weir and Cockerham mean Fst estimate
+v$MeanFst    
+summary(v$FstSNP)
+```
+
+
+```{r MI_relatedness,include=F,eval=T,echo=T}
+MI.id <- sample.id[pop_code$V2 == "MI"]
+ibd <- snpgdsIBDMoM(genofile, sample.id=MI.id,
+    maf=0.05, missing.rate=0.05, num.thread=4, autosome.only=F)
+
+ibd.coeff <- snpgdsIBDSelection(ibd)
+head(ibd.coeff)
+
+plot(ibd.coeff$k0, ibd.coeff$k1, xlim=c(0,1), ylim=c(0,1),
+    xlab="k0", ylab="k1", main="MI samples (MoM)")
+lines(c(0,1), c(1,0), col="red", lty=2)
+```
+
+
+```{r SR_relatedness,include=F,eval=T,echo=F}
+SR.id <- sample.id[pop_code$V2 == "SR"]
+ibd <- snpgdsIBDMoM(genofile, sample.id=SR.id,
+    maf=0.05, missing.rate=0.05, num.thread=4, autosome.only=F)
+
+ibd.coeff <- snpgdsIBDSelection(ibd)
+head(ibd.coeff)
+
+plot(ibd.coeff$k0, ibd.coeff$k1, xlim=c(0,1), ylim=c(0,1),
+    xlab="k0", ylab="k1", main="MGWSR samples (MoM)")
+lines(c(0,1), c(1,0), col="red", lty=2)
+```
+
+Now we can assess relatedness using a method-of-moments approach, first for MI:
+
+```{r MI_relatedness_nofilt}
+MI.id <- sample.id[pop_code$V2 == "MI"]
+ibd <- snpgdsIBDMoM(genofile, sample.id=MI.id,
+     num.thread=4, autosome.only=F)
+
+ibd.coeff <- snpgdsIBDSelection(ibd)
+head(ibd.coeff)
+
+plot(ibd.coeff$k0, ibd.coeff$k1, xlim=c(0,1), ylim=c(0,1),
+    xlab="k0", ylab="k1", main="MI samples (MoM)")
+lines(c(0,1), c(1,0), col="red", lty=2)
+```
+
+And then for SR:
+
+```{r SR_relatedness_nofilt}
+SR.id <- sample.id[pop_code$V2 == "SR"]
+ibd <- snpgdsIBDMoM(genofile, sample.id=SR.id,
+    num.thread=4, autosome.only=F)
+
+ibd.coeff <- snpgdsIBDSelection(ibd)
+head(ibd.coeff)
+
+plot(ibd.coeff$k0, ibd.coeff$k1, xlim=c(0,1), ylim=c(0,1),
+    xlab="k0", ylab="k1", main="MGWSR samples (MoM)")
+lines(c(0,1), c(1,0), col="red", lty=2)
+```
+We can then look at all individuals together:
+
+```{r all_relatedness_nofilt}
+ibd <- snpgdsIBDMoM(genofile, sample.id=sample.id,
+    num.thread=4, autosome.only=F)
+
+ibd.coeff <- snpgdsIBDSelection(ibd)
+head(ibd.coeff)
+
+plot(ibd.coeff$k0, ibd.coeff$k1, xlim=c(0,1), ylim=c(0,1),
+    xlab="k0", ylab="k1", main="All samples (MoM)")
+lines(c(0,1), c(1,0), col="red", lty=2)
+```
+
+Then we can look at identity-by-state:
+
+```{r Identity-by-state}
+ibs <- snpgdsIBS(genofile, num.thread=2, autosome.only=F)
+
+pop.idx <- order(pop_code$V2)
+
+image(ibs$ibs[pop.idx, pop.idx], col=color.gradient(y))
+#image(ibs$ibs[pop.idx, pop.idx], col=terrain.colors(16))
+```
+
+To perform multidimensional scaling analysis on the n×n matrix of genome-wide IBS pairwise distances:
+
+```{r mdsa}
+#palette(Titipounamu)
+loc <- cmdscale(1 - ibs$ibs, k = 2)
+x <- loc[, 1]; y <- loc[, 2]
+#popn <- oranges[as.factor(pop_code)]
+popn <- as.factor(pop_code$V2)
+plot(x, y, col=oranges[popn], xlab = "", ylab = "", pch=16,
+    main = "Multidimensional Scaling Analysis (IBS)")
+legend("topleft", legend=levels(popn), col=oranges, pch=16, text.col="black")
+
+```
+To perform cluster analysis on the n×n matrix of genome-wide IBS pairwise distances, and determine the groups by a permutation score:
+
+```{r cluster}
+
+set.seed(100)
+ibs.hc <- snpgdsHCluster(snpgdsIBS(genofile,
+                                   num.thread=2,autosome.only = F))
+
+# Determine groups of individuals automatically
+rv <- snpgdsCutTree(ibs.hc)
+
+plot(rv$dendrogram, leaflab="none", main="HapMap Phase II")
+
+table(rv$samp.group)
+
+# Determine groups of individuals by population information
+rv2 <- snpgdsCutTree(ibs.hc, samp.group=as.factor(pop_code$V2))
+
+nodeCols <- as.factor(oranges[popn])
+GROUP <- rv2$samp.group
+cols <- levels(legend.cols)
+col_GROUP <- cols[GROUP]
+col_GROUP
+col_GROUP <- col_GROUP[order.dendrogram(rv2$dendrogra)] 
+
+library(dendextend)
+library(colorspace)
+
+dend <- rv2$dendrogram
+#dend <- dend %>%
+#  set("leaves_col", col_GROUP) %>%
+#  plot(leaflab="none", ylab="Individual dissimilarity")
+##  legend("bottomright", legend=levels(popn), col=levels(legend.cols), 
+#       pch=19, ncol=4)
+#dend
+
+tiff("Figure3.tiff", compression = "lzw", units="in", width=6, height=4, res=400)
+
+# Make a plot
+dend %>%
+  set("leaves_col", col_GROUP) %>%
+  plot(leaflab="none", ylab="Individual dissimilarity")
+  legend("bottomright", legend=levels(popn), col=levels(legend.cols), 
+       pch=19, ncol=4, cex=0.7)
+
+# Close device
+dev.off()
+
+#plot(rv2$dendrogram, fill=col_GROUP, leaflab="none",  main="HapMap Phase II")
+#legend("bottomright", legend=levels(popn), col=levels(legend.cols), 
+#       pch=19, ncol=4)
+
+# add indiv labels
+#plot(rv2$dendrogram, col=mwlrcols, leaflab="perpendicular",  main="HapMap Phase II")
+#legend("bottomright", legend=levels(popn), col=levels(legend.cols),
+#       pch=19, ncol=4)
+
+dend <- rv2$dendrogram
+tiff("Figure3.2.tiff", compression = "lzw", units="in", width=7, height=4, res=400)
+dend %>%
+  set("leaves_col", col_GROUP) %>%
+  plot(leaflab="perpendicular", ylab="Individual dissimilarity")
+  legend("bottomright", legend=levels(popn), col=levels(legend.cols), 
+       pch=19, ncol=4, cex=0.6)
+
+dev.off()
+
+tiff("Figure3.2b.tiff", compression = "lzw", units="in", width=7, height=4, res=400)
+dend %>%
+  set("leaves_col", col_GROUP) %>%
+  plot(leaflab="none", ylab="Individual dissimilarity")
+  legend("bottomright", legend=levels(popn), col=levels(legend.cols), 
+       pch=19, ncol=4, cex=0.6)
+
+dev.off()
+```
+
+
+```{r close, echo=F}
+# Close the GDS file
+snpgdsClose(genofile)
+```

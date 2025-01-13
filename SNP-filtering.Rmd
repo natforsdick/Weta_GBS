@@ -1,0 +1,211 @@
+---
+title: "Mahoenui Giant Wētā Supplementary Material"
+author: "Nat Forsdick"
+date: "2024-11-25"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+This supplementary file to the manuscript '*Population genomic analysis of Mahoenui giant wētā (*Deinacrida mahoenui*) reveals minimal reduction in genomic diversity following translocation*' (Forsdick et al. 2024) presents the output of SNP filtering and downstream analyses, predominantly using the SNPfiltR package. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE, fig.width = 7, fig.height = 6, ppi=200)
+```
+
+Get R and package details.
+
+```{r}
+#install.packages("SNPfiltR")
+library(SNPfiltR)
+library(vcfR)
+
+R.Version()
+
+(.packages())
+
+mwlrcols <- c("#88cfa8",  "cornflowerblue", "#898a8d")
+```
+
+Get vcf `populations-all2.snps.vcf`, and file encoding populations `Weta_GBS_Batch2_POP_blankrem.txt`.
+
+```{r}
+vcf <- read.vcfR("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/populations-all2.snps.vcf")
+
+pop_code <- read.delim("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/Weta_GBS_Batch2_POP_blankrem.txt", sep="\t", header=F)
+colnames(pop_code) <- c("id", "pop")
+```
+
+Visualise variant characteristics.
+
+```{r}
+hard_filter(vcfR=vcf)
+```
+
+Initial filtering on depth >=5, Q>=30.
+Then check for allele balance.
+Then consider maximum depth.
+
+```{r}
+vcf2<-hard_filter(vcfR=vcf, depth = 5, gq = 30)
+
+#execute allele balance filter
+vcf3<-filter_allele_balance(vcf2)
+
+#visualize and pick appropriate max depth cutoff
+max_depth(vcf3)
+
+#filter vcf by the max depth cutoff you chose
+vcf4<-max_depth(vcf3, maxdepth = 40)
+# 	0.66% of SNPs were above a mean depth of 50
+# 	0.7% of SNPs were above a mean depth of 48
+# 	0.75% of SNPs were above a mean depth of 46
+# 	7.41% of SNPs were above a mean depth of 28 and were removed from the vcf
+# 5.5% of SNPs were above a mean depth of 30 and were removed from the vcf
+# 	1.05% of SNPs were above a mean depth of 40 and were removed from the vcf
+
+vcf4
+```
+
+Now let's look at per sample missingness.
+
+```{r}
+#run function to visualize samples
+missing_by_sample(vcfR=vcf4, popmap = pop_code)
+# really useful outputs here
+```
+
+We see a couple of SR individuals that seem to be outliers with relatively high missingness and relatively low depth - likely the same 2 indivs.Now let's exclude samples above the missingness threshold of 0.8.
+
+Then let's exclude monomorphic sites using `min.mac = 1`.
+
+
+```{r}
+#run function to drop samples above the threshold we want from the vcf
+vcf5<-missing_by_sample(vcfR=vcf4, cutoff = .80)
+
+#subset popmap to only include retained individuals
+pop_code2<-pop_code[pop_code$id %in% colnames(vcf5@gt),]
+vcf5
+
+
+# check min mac
+vcf.mac1 <- min_mac(vcf5, min.mac = 1)
+
+vcf.mac1
+
+```
+
+Now let's check missingness by site across different thresholds (0.6, 0.7, 0.75, 0.8).
+
+```{r}
+#visualize missing data by SNP and the effect of various cutoffs on the missingness of each sample
+missing_by_snp(vcf.mac1)
+
+#verify that missing data is not driving clustering patterns among the retained samples
+# threshold = SNP completeness cutoff
+miss.mac1 <- assess_missing_data_pca(vcfR=vcf.mac1, popmap = pop_code2, thresholds = c(.6,.7,.75,.8), clustering = FALSE)
+
+```
+
+Notes from the tutorial "A good rule of thumb is that individual samples shouldn’t be above 50% missing data after applying a per-SNP missing data cutoff. So if we are retaining specific low data samples out of necessity or project design, we may have to set a more stringent per-SNP missing data cutoff, at the expense of the total number of SNPs retained for downstream analyses." 
+
+ok, so I think we want a cutoff of 0.6 - gives more than 10k SNPs, so still ok to filter a little further. 
+
+```{r}
+# 
+
+#choose a value that retains an acceptable amount of missing data in each sample, and maximizes SNPs retained while minimizing overall missing data, and filter vcf
+
+vcf.mac1.snpmiss60<-missing_by_snp(vcf.mac1, cutoff = .6)	
+
+vcf.mac1.snpmiss60
+
+```
+
+Now let's consider different minimum minor allele counts - we ideally want to exclude singletons (and private doubletons) that may impact structure analysis. Let's consider `min.mac = {2,3}`.
+
+```{r}
+#investigate clustering patterns with and without a minor allele cutoff
+#use min.mac() to investigate the effect of multiple cutoffs
+vcf.snpmiss60.mac2 <-min_mac(vcfR = vcf.mac1.snpmiss60, min.mac = 2)
+
+vcf.snpmiss60.mac2
+
+vcf.snpmiss60.mac3 <-min_mac(vcfR = vcf.mac1.snpmiss60, min.mac = 3)
+
+vcf.snpmiss60.mac3
+  
+#assess clustering without MAC cutoff
+miss<-assess_missing_data_tsne(vcf.mac1.snpmiss60, pop_code2, clustering = FALSE)
+
+#assess clustering with MAC cutoff
+miss<-assess_missing_data_tsne(vcf.snpmiss60.mac2, pop_code2, clustering = FALSE)
+
+#assess clustering with MAC cutoff
+miss<-assess_missing_data_tsne(vcf.snpmiss60.mac3, pop_code2, clustering = FALSE)
+```
+
+Now let's look at the filtered set with min.MAC = a) 1 and b) 2 and consider per sample 1) depth and 2) genotype quality. 
+
+```{r}
+#plot depth per snp and per sample
+dp <- extract.gt(vcf.snpmiss60.mac2, element = "DP", as.numeric=TRUE)
+heatmap.bp(dp, rlabels = FALSE)
+
+#plot genotype quality per snp and per sample
+gq <- extract.gt(vcf.snpmiss60.mac2, element = "GQ", as.numeric=TRUE)
+heatmap.bp(gq, rlabels = FALSE)
+
+#plot depth per snp and per sample
+dp <- extract.gt(vcf.snpmiss60.mac3, element = "DP", as.numeric=TRUE)
+heatmap.bp(dp, rlabels = FALSE)
+
+#plot genotype quality per snp and per sample
+gq <- extract.gt(vcf.snpmiss60.mac3, element = "GQ", as.numeric=TRUE)
+heatmap.bp(gq, rlabels = FALSE)
+
+```
+
+Then we can thin the variants to only a single SNP per 500 bp, and write out the filtered VCF `weta.snpmiss60.mac3.thin.vcf`. 
+
+```{r }
+#write out vcf with all SNPs
+vcfR::write.vcf(vcf.snpmiss60.mac2, "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac2.vcf.gz")
+
+#linkage filter vcf to thin SNPs to one per 500bp
+vcfR.thin<-distance_thin(vcf.snpmiss60.mac2, min.distance = 500)
+
+
+#write out vcf with thinned SNPs
+vcfR::write.vcf(vcfR.thin, "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac2.thin.vcf.gz")
+
+
+#linkage filter vcf to thin SNPs to one per 500bp
+vcfR.thin3<-distance_thin(vcf.snpmiss60.mac3, min.distance = 500)
+#write out vcf with thinned SNPs
+vcfR::write.vcf(vcfR.thin3, "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf.gz")
+
+```
+
+
+
+```{r}
+## adding outlier analysis - results of BayeScan for SNPs under selection
+source("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/plot_R.r")
+
+plot_bayescan("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/out-weta.snpmiss60.mac3.thin.bayes_fst.txt", FDR=0.05)
+
+#tiff("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/bayescan-outliers.tiff", compression = "lzw", units = "in", width=5, height = 5, res = 400)
+#plot_bayescan("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/bayescan-out/out-weta.snpmiss60.mac3.thin.bayes_fst.txt", FDR=0.05)
+#dev.off()
+```
+
+
+We used BayeScan to screen the VCF for putative SNPs under selection. The figure above shows the results of this analysis, plotted using the `plot_bayescan` function, to identify outlier SNPs.  
+
+Below we reproduce the plots of fastSTRUCTURE results where individuals are ordered by 1) sex, and 2) colour. In these plots, each vertical line represents one individual, coloured according to cluster assignment, when _K_ = 3. We do not reproduce the plots for _K_ = 2, as no population structure was identified. There does not appear to be any association between weak population structure and either of these characteristics. 
+
+![Sex]("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/FastStructure/figures/CLUMPP_merged_k3_sex.png"){width="120%"}
+
+![Colour]("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/FastStructure/figures/CLUMPP_merged_k3_sex.png"){width="120%"}
