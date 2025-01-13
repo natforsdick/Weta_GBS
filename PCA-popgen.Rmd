@@ -76,11 +76,11 @@ oranges <- c("#de7c00","#ebb700","#C05E23")
 
 ```{r import_vcfs}
 # check vcf is not zipped
-vcf.fn <- "C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf"
+vcf.fn <- "/path/to/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf"
 
 #file.size(vcf.fn)
 #vcf_test1 <- read.vcfR(vcf.fn)
-snpgdsVCF2GDS("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf", "test.gds", method="biallelic.only")
+snpgdsVCF2GDS("/path/to/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin.vcf", "test.gds", method="biallelic.only")
 
 snpgdsSummary("test.gds")
 
@@ -95,9 +95,9 @@ head(genofile)
 
 ```{r get_pop}
 # Get population information
-#pop_code <- scan("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin-pop.txt",
+#pop_code <- scan("/path/to/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin-pop.txt",
 #                 what=character())
-pop_code <- read.delim("C:/Users/ForsdickN/OneDrive - MWLR/Documents/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin-pop.txt", sep="\t", header=F)
+pop_code <- read.delim("/path/to/Weta-GBS/2024-11-01-Results/weta.snpmiss60.mac3.thin-pop.txt", sep="\t", header=F)
 table(pop_code)
 
 # Display the first six values
@@ -173,6 +173,7 @@ legend("topleft", legend=levels(datpop),
 ```
 
 To calculate the SNP correlations between eigenvectors and SNP genotypes:
+
 ```{r get_corr}
 palette(alphabet2())
 # Get chromosome index
