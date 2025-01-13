@@ -12,15 +12,15 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 
 ## Software
 
-* [Stacks](https://catchenlab.life.illinois.edu/stacks/) v2.41
-
+* [Stacks](https://catchenlab.life.illinois.edu/stacks/) v2.65
 * [TrimGalore](https://github.com/FelixKrueger/TrimGalore) v0.6.4
   * [FastQC](https://github.com/s-andrews/FastQC) v0.11.9
   * [cutadapt](https://cutadapt.readthedocs.io/en/v2.3/) v2.3
+* Bowtie2 v2.3.5
 * SAMtools v1.9
-* VCFtools v
-* PLINK v
-* [Structure](https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v2.3.4/structure_doc.pdf) v2.3.4
+* VCFtools v0.1.15
+* PLINK v1.09b6.16
+* [fastStructure]() v1.0
 * R v4.3.1
   * [adegenet](https://cran.r-project.org/web/packages/adegenet/index.html) v2.1.3
   * [SNPRelate](https://github.com/zhengxwen/SNPRelate) v1.34.1
@@ -28,15 +28,15 @@ The workflow moves through demultiplexing, quality control, and mapping, before 
 
 ## Pipeline
 
-1. [stacks_process_radtags.sl](stacks_process_radtags.sl) - Demultiplex raw paired-end GBS with Stacks _process_radtags_.
-2. [run_trimgalore_B2.sl](run_trimgalore_B2.sl) - Trim and adapter removal
-3. [run_bowtie2_index.sl](run_bowtie2_index.sl) - Index reference genome
-4. [02_bowtie_B2.sl](02_bowtie_B2.sl) - Map individual data, collect mapping statistics
-5. [03_ref_map.sl](03_ref_map.sl) - Run Stacks _ref_map.pl_
-6. [04_stacks_populations_B2.sl](04_stacks_populations_B2.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
-7. [05_vcf2adegenet.sl](05_vcf2adegenet.sl) - Convert VCF to PLINK format for conversion to other formats for downstream processing
+1. [01-stacks_process_radtags.sl](01-stacks_process_radtags.sl) - Demultiplex raw paired-end GBS with Stacks _process_radtags_.
+2. [02-trimgalore_PE2.sl](02-trimgalore_PE2.sl) - Trim and adapter removal
+3. [03-bowtie-index-ref.sl](03-bowtie-index-ref.sl) - Index the Poor Knights giant wētā reference genome assembly
+4. [04-bowtie-align.sl](04-bowtie-align.sl) - Align individual data to the reference genome assembly, collect mapping statistics
+5. [05-refmap.sl](05-refmap.sl) - Run Stacks _ref_map.pl_
+6. [06-stacks-popns.sl](06-stacks-popns.sl) - Call and filter variants, allowing either 30% or 0% missing data, collect preliminary statistics, and output as VCF and PLINK 
+7. [07-export-format.sh](07-export-format.sh) - Convert VCF to various formats for downstream processing
 8. Analysis of final SNP sets in R
    * []() - Discriminant analysis of principal components and more with adegenet
    * []() - Principal component analysis, Fst, and more with SNPRelate
-9. [06_structure.sl](06_structure.sl) - Analysis of final SNP sets with STRUCTURE
+9. [08-faststructure.sl](08-faststructure.sl) - Analysis of final SNP sets with fastSTRUCTURE
 10. Visualisation of combined STRUCTURE outputs in R with 
