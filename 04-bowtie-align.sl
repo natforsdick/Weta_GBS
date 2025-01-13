@@ -1,6 +1,5 @@
 #!/bin/bash -e
 #SBATCH --job-name=mapping
-#SBATCH -A ga03186
 #SBATCH --time=00:30:00
 #SBATCH --mem=12G
 #SBATCH --cpus-per-task=12
@@ -27,13 +26,13 @@ module list
 
 ###########
 # PARAMS
-refdir=/nesi/project/ga03186/ref/
+refdir=/path/to/ref/
 reffile=Deinacrida-fallai-asm-10kb
 ref=$refdir$reffile
-samplist=/nesi/project/ga03186/ref/Weta_GBS_Batch2_filelist.txt
-INDIR=/nesi/nobackup/ga03048/Weta_GBS_Batch2/01_stacks_demux_PE2/02_trimmed_PE2/
-OUTSAM=/nesi/nobackup/ga03048/Weta_GBS_Batch2/03_bowtie/SAM/
-OUTBAM=/nesi/nobackup/ga03048/Weta_GBS_Batch2/03_bowtie/BAM/
+samplist=/path/to/ref/Weta_GBS_Batch2_filelist.txt
+INDIR=/path/to/01_stacks_demux_PE2/02_trimmed_PE2/
+OUTSAM=/path/to/03_bowtie/SAM/
+OUTBAM=/path/to/03_bowtie/BAM/
 ###########
 
 if [ ! -e ${OUTBAM} ]; then
